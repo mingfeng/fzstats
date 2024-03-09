@@ -6,8 +6,13 @@ authors = ["Mingfeng Yu <mfdevworld@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
+typer = {extras = ["all"], version = "^0.9.0"}
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+ipython = "^8.22.2"
 
 [build-system]
 requires = ["poetry-core"]
