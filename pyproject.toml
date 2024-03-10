@@ -6,7 +6,7 @@ authors = ["Mingfeng Yu <mfdevworld@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-fzstats = "fzstats.main"
+fzstats = "fzstats.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"

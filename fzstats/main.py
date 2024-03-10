@@ -7,6 +7,7 @@ import typer
 from rich.console import Console
 from rich.table import Column, Table
 
+app = typer.Typer()
 
 @dataclass
 class PathSize:
@@ -91,6 +92,7 @@ def limit_callback(value: int):
     return value
 
 
+@app.command()
 def main(
     folder_path: Annotated[str, typer.Argument(help="The path to the folder.")] = ".",
     sort_by: Annotated[
@@ -121,6 +123,3 @@ def main(
     console = Console()
     console.print(table)
 
-
-if __name__ == "__main__":
-    typer.run(main)
