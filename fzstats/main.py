@@ -1,11 +1,11 @@
-from enum import Enum
 import os
 from dataclasses import dataclass
-from typing import Literal, Annotated
+from enum import Enum
+from typing import Annotated, Literal
 
 import typer
 from rich.console import Console
-from rich.table import Table
+from rich.table import Column, Table
 
 
 @dataclass
@@ -83,12 +83,13 @@ def main(
     sort_by: Annotated[SortBy, typer.Option("--sort", "-s")] = "size",
 ):
     children_with_sizes = get_children_sizes(folder_path, sort_by.value)
-    table = Table()
-    table.add_column("Name")
-    table.add_column("Type")
-    table.add_column("Size", justify="right")
+    table = Table(
+        "Name",
+        Column("Size", justify="right", style="green"),
+    )
     for item in children_with_sizes:
-        table.add_row(item.name, item.type, format_size(item.size))
+        name = item.name if item.type == "file" else f"[blue]{item.name}"
+        table.add_row(name, format_size(item.size))
 
     console = Console()
     console.print(table)
