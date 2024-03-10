@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 from dataclasses import dataclass
 from typing import Literal, Annotated
@@ -12,6 +13,12 @@ class PathSize:
     name: str
     type: Literal["file", "folder"]
     size: int
+
+
+class SortBy(Enum):
+    NAME = "name"
+    TYPE = "type"
+    SIZE = "size"
 
 
 def get_folder_size(folder_path="."):
@@ -31,7 +38,10 @@ def get_folder_size(folder_path="."):
     return total_size
 
 
-def get_children_sizes(folder_path: str = ".") -> list[PathSize]:
+def get_children_sizes(
+    folder_path: str = ".",
+    sort_by: str = "size",
+) -> list[PathSize]:
     """Get folder children and their sizes
 
     Args:
@@ -51,7 +61,7 @@ def get_children_sizes(folder_path: str = ".") -> list[PathSize]:
             size = get_folder_size(child_path)
             children_with_sizes.append(PathSize(child, "folder", size))
     # by default sort results by size in descending order
-    children_with_sizes.sort(key=lambda item: item.size, reverse=True)
+    children_with_sizes.sort(key=lambda item: getattr(item, sort_by), reverse=True)
     return children_with_sizes
 
 
@@ -68,8 +78,11 @@ def format_size(size: int) -> str:
     return f"{size}B"
 
 
-def main(folder_path: Annotated[str, typer.Argument()] = "."):
-    children_with_sizes = get_children_sizes(folder_path)
+def main(
+    folder_path: Annotated[str, typer.Argument()] = ".",
+    sort_by: Annotated[SortBy, typer.Option("--sort", "-s")] = "size",
+):
+    children_with_sizes = get_children_sizes(folder_path, sort_by.value)
     table = Table()
     table.add_column("Name")
     table.add_column("Type")
