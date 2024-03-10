@@ -41,14 +41,19 @@ def get_folder_size(folder_path="."):
 def get_children_sizes(
     folder_path: str = ".",
     sort_by: str = "size",
+    reverse: bool = False,
+    limit: int = None,
 ) -> list[PathSize]:
-    """Get folder children and their sizes
+    """Get folder children sizes
 
     Args:
-        folder_path (str, optional): Path to the folder. Defaults to ".".
+        folder_path (str, optional): The path to the folder. Defaults to ".".
+        sort_by (str, optional): Sort results by. Defaults to "size".
+        reverse (bool, optional): Sort results in reverse order. Defaults to False.
+        limit (int, optional): limit results by. Defaults to None.
 
     Returns:
-        list[PathSize]: children with the their sizes
+        list[PathSize]: folder children with their sizes
     """
     children_with_sizes = []
     for child in os.listdir(folder_path):
@@ -61,7 +66,9 @@ def get_children_sizes(
             size = get_folder_size(child_path)
             children_with_sizes.append(PathSize(child, "folder", size))
     # by default sort results by size in descending order
-    children_with_sizes.sort(key=lambda item: getattr(item, sort_by), reverse=True)
+    children_with_sizes.sort(key=lambda item: getattr(item, sort_by), reverse=reverse)
+    if limit:
+        children_with_sizes = children_with_sizes[0:limit]
     return children_with_sizes
 
 
@@ -78,11 +85,31 @@ def format_size(size: int) -> str:
     return f"{size}B"
 
 
+def limit_callback(value: int):
+    if value and value <= 0:
+        raise typer.BadParameter("Only positive values are allowed")
+    return value
+
+
 def main(
-    folder_path: Annotated[str, typer.Argument()] = ".",
-    sort_by: Annotated[SortBy, typer.Option("--sort", "-s")] = "size",
+    folder_path: Annotated[str, typer.Argument(help="The path to the folder.")] = ".",
+    sort_by: Annotated[
+        SortBy, typer.Option("--sort", "-s", help="Sort results by.")
+    ] = "size",
+    reverse: Annotated[
+        bool, typer.Option("--reverse", "-r", help="Show results in reverse order.")
+    ] = False,
+    limit: Annotated[
+        int,
+        typer.Option(
+            "--limit",
+            "-l",
+            callback=limit_callback,
+            help="Limit results by.",
+        ),
+    ] = None,
 ):
-    children_with_sizes = get_children_sizes(folder_path, sort_by.value)
+    children_with_sizes = get_children_sizes(folder_path, sort_by.value, reverse, limit)
     table = Table(
         "Name",
         Column("Size", justify="right", style="green"),
