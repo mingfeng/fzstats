@@ -9,6 +9,7 @@ from rich.table import Column, Table
 
 app = typer.Typer()
 
+
 @dataclass
 class PathSize:
     name: str
@@ -32,10 +33,11 @@ def get_folder_size(folder_path="."):
         int: folder size in bytes
     """
     total_size = 0
-    for dirpath, dirnames, filenames in os.walk(folder_path):
+    for dirpath, _, filenames in os.walk(folder_path):
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
-            total_size += os.path.getsize(file_path)
+            if not os.path.islink(file_path):
+                total_size += os.path.getsize(file_path)
     return total_size
 
 
@@ -122,4 +124,3 @@ def main(
 
     console = Console()
     console.print(table)
-
