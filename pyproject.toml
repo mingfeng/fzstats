@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fzstats"
-version = "0.1.1"
+version = "0.1.2"
 description = "Display statistics for file and folder sizes"
 authors = ["Mingfeng Yu <mfdevworld@gmail.com>"]
 readme = "README.md"
